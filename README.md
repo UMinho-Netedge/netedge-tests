@@ -1,6 +1,6 @@
-# netedge-tests
+# UMinho NetEdge Testing Scripts
 Netedge MP1 testing scripts
-
+ - get_services.py: Tests GET /services mp1 resource
 
 # How to configure
 
