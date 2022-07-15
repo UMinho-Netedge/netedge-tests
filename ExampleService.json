@@ -1,0 +1,34 @@
+{
+  "serInstanceId": "ServiceInstance123",
+  "serName": "ExampleService",
+  "serCategory": {
+    "href": "catItem1",
+    "id": "id12345",
+    "name": "RNI",
+    "version": "version1"
+  },
+  "version": "ServiceVersion1",
+  "state": "ACTIVE",
+  "transportInfo": {
+    "id": "TransId12345",
+    "name": "REST",
+    "description": "REST API",
+    "type": "REST_HTTP",
+    "protocol": "HTTP",
+    "version": "2.0",
+    "endpoint": {
+      "uris": [
+        "/mecSerMgmtApi/service/EntryPoint"
+      ]
+    },
+    "security": {
+      "oAuth2Info": {
+        "grantTypes": [
+          "OAUTH2_CLIENT_CREDENTIALS"
+        ],
+        "tokenEndpoint": "/mecSerMgmtApi/security/TokenEndPoint"
+      }
+    }
+  },
+  "serializer": "JSON"
+}
