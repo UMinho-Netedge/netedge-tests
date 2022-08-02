@@ -62,7 +62,7 @@ def test_check_status_code_equals_404():
 # 414 - It is used to indicate that the server is refusing to process the request because
 # the request URI is longer than the server is willing or able to process.
 def test_check_data_status_code_equals_414():
-    longstring = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(1000))
+    longstring = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(1000000))
     response = requests.get("http://127.0.0.1:8080/mec_service_mgmt/v1/applications/12321/services?"
                             f"ser_name={longstring}")
     assert response.status_code == 414
