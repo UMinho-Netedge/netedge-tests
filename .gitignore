@@ -1,0 +1,9 @@
+
+# macOS Files
+.DS_Store
+
+# Thumbnails
+._*
+
+# Directories
+__pycache__/
