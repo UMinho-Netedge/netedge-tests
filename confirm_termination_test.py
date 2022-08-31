@@ -43,7 +43,7 @@ def context():
             url = serv_mgmt + "applications/" + str(appInstanceId) + "/services"
             serv_json = json_service_v1.copy()
             serv_json['serName'] = serName
-    print('END CONTEXT!')
+            
     
 # App doesn't exist in db (appInstanceId = 12321)
 def test_409Conflict_v1():

@@ -1,0 +1,8 @@
+{
+	"dnsRuleId": "1234",
+	"domainName": "domain.com",
+	"ipAddressType": "IP_V4",
+	"ipAddress": "123.1.1.254",
+	"ttl": 5,
+	"state": "ACTIVE"
+}

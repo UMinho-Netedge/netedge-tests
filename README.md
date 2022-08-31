@@ -8,7 +8,6 @@ $ pip install -r requirements.txt
 
 
 # How to use
-
-$ python3 -m pytest <script_name.py>
+$ python3 -m pytest [-vs] <script_name.py>
 
 
