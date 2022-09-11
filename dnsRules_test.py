@@ -1,9 +1,11 @@
 from urllib import response
+from wsgiref import headers
 import requests
 import json
 import pytest
 import pprint as pp
 import jsonpath as jsp
+import time
 
 
 baseUrl = "http://127.0.0.1:8080/"
@@ -142,6 +144,102 @@ def test_put_403_Forbidden(context):
     detail = jsp.jsonpath(json.loads(response.text), 'detail')
     print("Attempt to update a DNS rule of a app without ready status [error msg]: " 
             + detail[0])
+
+
+def test_put_419_PreConditionFailed(context):
+    appInstanceId = "111"
+    dnsRuleId = "dns_rule_1_" + str(appInstanceId)
+    url = app_supp + "applications/" + appInstanceId + "/dns_rules/" + dnsRuleId
+    
+    get_response = requests.get(url)
+    etag = get_response.headers['ETag']
+    last_modified = get_response.headers['Last-Modified']
+    print(f"GET RESPONSE # ETag: {etag} Last-Modified: {last_modified}")
+
+    time.sleep(2)
+
+    response = requests.put(
+        url, 
+        json ={"ipAddressType": "IP_V6"},
+        headers={"If-Unmodified-Since": last_modified, "If-Match": etag}
+        )
+
+    '''
+    Update ipAddressType with sucess and returns ETag and Last-Modified within header
+    '''
+    assert response.status_code == 200
+    assert 'ETag' in response.headers
+    assert 'Last-Modified' in response.headers
+
+    new_etag = response.headers['ETag']
+    new_date = response.headers['Last-Modified']
+    print(f"PUT 1 RESPONSE HEADER# new ETag: {new_etag} new_date {new_date}")
+
+    time.sleep(2)
+
+    response = requests.put(
+        url, 
+        json ={"ipAddressType": "IP_V4"}, 
+        headers={"If-Unmodified-Since": new_date, "If-Match": new_etag}
+        )
+    print(f"PUT 2 RESP HEADER: {response.headers}")
+
+    ipAddressType = jsp.jsonpath(json.loads(response.text), 'ipAddressType')
+    
+
+    '''
+    Update ipAddressType to the previous value giving the same etag as in GET (first time) 
+    '''
+    assert response.status_code == 200
+    assert ipAddressType[0] == "IP_V4"
+    assert response.headers['ETag'] == etag
+    
+    new_date = response.headers['Last-Modified']
+    print(f"PUT2 new ETag: {response.headers['ETag']} new_date {new_date}")
+
+    time.sleep(2)
+
+    # first date as last_modified (wrong date)
+    # right etag
+    put_headers={
+        "If-Unmodified-Since": last_modified,
+        "If-Match": etag,
+    }
+    response = requests.put(
+        url, 
+        json ={"ipAddressType": "IP_V6"}, 
+        headers=put_headers)
+    
+    ipAddressType = jsp.jsonpath(json.loads(response.text), 'ipAddressType')
+
+    print(f"PUT2 new ETag: {response.headers['ETag']} new_date {response.headers['Last-Modified']}")
+
+
+    assert response.status_code == 412
+    # confirmar que não mudou ipAddresseType
+
+    detail = jsp.jsonpath(json.loads(response.text), 'detail')
+    print("Attempt to update a DNS rule with different 'Last-Modified' date [error msg]: " 
+            + detail[0])
+
+    # right last_modified date
+    # wrong etag
+    put_headers={
+        "If-Unmodified-Since": new_date,
+        "If-Match": new_etag,
+    }
+    response = requests.put(
+        url, 
+        json ={"ipAddressType": "IP_V6"}, 
+        headers=put_headers)
+    
+    ipAddressType = jsp.jsonpath(json.loads(response.text), 'ipAddressType')
+
+    assert response.status_code == 412
+    detail = jsp.jsonpath(json.loads(response.text), 'detail')
+    print("Attempt to update a DNS rule with different ETag [error msg]: " 
+            + detail[0])
+            
 
 ################################################################################
 # GET
@@ -310,10 +408,15 @@ def test_get_all_dns_rules_403_Forbidden(context):
     url = app_supp + "applications/" + appInstanceId + "/dns_rules"
     response = requests.get(url)
 
+    print("\n\nHEADER: ")
+    pp.pprint(response.request.headers)
+
     assert response.status_code == 403
     detail = jsp.jsonpath(json.loads(response.text), 'detail')
     print("Attempt to get DNS rules of a not ready app [error msg]: " 
             + detail[0])
+
+
 
 
 
