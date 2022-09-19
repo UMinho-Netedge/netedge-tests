@@ -1,0 +1,10 @@
+{
+  "subscriptionType": "string",
+  "callbackReference": "http://www.google1.com",
+  "filteringCriteria": {
+		"states": [
+			"ACTIVE"
+		],
+		"isLocal": true
+  }
+}
