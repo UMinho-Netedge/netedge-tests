@@ -26,6 +26,7 @@ def context():
         #print(f"json_ready_conf type: {type(json_ready_conf)}")
         url = app_supp + "applications/" + str(appInstanceId) + "/confirm_ready"
         requests.post(url, json=json_ready_conf)
+        time.sleep(6)
 
         url = tests + "applications/" + str(appInstanceId) + "/dns_rules/"
         for dnsRule in ["dns_rule_1_" + str(appInstanceId), 
@@ -140,6 +141,8 @@ def test_put_403_Forbidden(context):
 
     response = requests.put(url, json ={"ipAddressType": "IP_V6"})
 
+    print("\n## Before 403 Forbidden assertion ##\n")
+
     assert response.status_code == 403
     detail = jsp.jsonpath(json.loads(response.text), 'detail')
     print("Attempt to update a DNS rule of a app without ready status [error msg]: " 
@@ -156,7 +159,7 @@ def test_put_419_PreConditionFailed(context):
     last_modified = get_response.headers['Last-Modified']
     print(f"GET RESPONSE # ETag: {etag} Last-Modified: {last_modified}")
 
-    time.sleep(2)
+    time.sleep(6)
 
     response = requests.put(
         url, 
@@ -175,7 +178,7 @@ def test_put_419_PreConditionFailed(context):
     new_date = response.headers['Last-Modified']
     print(f"PUT 1 RESPONSE HEADER# new ETag: {new_etag} new_date {new_date}")
 
-    time.sleep(2)
+    time.sleep(6)
 
     response = requests.put(
         url, 
@@ -197,7 +200,7 @@ def test_put_419_PreConditionFailed(context):
     new_date = response.headers['Last-Modified']
     print(f"PUT2 new ETag: {response.headers['ETag']} new_date {new_date}")
 
-    time.sleep(2)
+    time.sleep(6)
 
     # first date as last_modified (wrong date)
     # right etag
